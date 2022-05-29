@@ -33,6 +33,7 @@ app.use("/api/post", checkToken, apiPost_1.default);
 app.use("/api/comment", apiComment_1.default);
 app.use("/api/category", apiCategory_1.default);
 app.use("/api/handleCategory", checkToken, apiHandleCategory_1.default);
+app.get('*', (req, res) => res.sendFile(path_1.default.resolve(__dirname, 'public/index.html')));
 app.use(errorHandler_1.default);
 app.use((req, res, next) => {
     if (!res.headersSent) {

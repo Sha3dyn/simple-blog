@@ -19,16 +19,19 @@ const prisma = new client_1.PrismaClient();
 const apiPostRouter = express_1.default.Router();
 apiPostRouter.use(express_1.default.json());
 apiPostRouter.delete("/:id", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const post = yield prisma.post.findFirst({
+    const post = yield prisma.post.findUnique({
         where: {
             id: Number(req.params.id)
         },
     });
     if (post) {
         try {
+            yield prisma.comment.deleteMany({
+                where: { postId: post.id }
+            });
             yield prisma.post.delete({
                 where: {
-                    id: Number(req.params.id)
+                    id: Number(post.id)
                 }
             });
             res.json(yield prisma.post.findMany());
@@ -43,12 +46,16 @@ apiPostRouter.delete("/:id", (req, res, next) => __awaiter(void 0, void 0, void 
 }));
 apiPostRouter.put("/:id", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const categories = req.body.categories || [];
-    const post = yield prisma.post.findFirst({
+    const post = yield prisma.post.findUnique({
         where: {
             id: Number(req.params.id)
         },
+        include: {
+            comments: true
+        }
     });
     if (post) {
+        console.log(req.body);
         try {
             yield prisma.post.update({
                 where: {
@@ -58,8 +65,7 @@ apiPostRouter.put("/:id", (req, res, next) => __awaiter(void 0, void 0, void 0, 
                     title: req.body.title,
                     content: req.body.content,
                     updatedAt: new Date(),
-                    userId: post.userId,
-                    categories: { connect: categories }
+                    categories: { connect: categories },
                 }
             });
             res.json(yield prisma.post.findMany());

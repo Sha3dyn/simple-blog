@@ -26,13 +26,13 @@ const checkToken = (req : express.Request, res : express.Response, next : expres
 }
 
 app.use(express.static(path.resolve(__dirname, "public")));
-
 app.use("/api/auth", apiAuthRouter);
 app.use("/api/blog", apiBlogRouter);
 app.use("/api/post", checkToken, apiPostRouter);
 app.use("/api/comment", apiCommentRouter);
 app.use("/api/category", apiCategoryRouter);
 app.use("/api/handleCategory", checkToken, apiHandleCategoryRouter);
+app.get('*', (req, res) => res.sendFile(path.resolve(__dirname, 'public/index.html')));
 
 app.use(errorHandler);
 

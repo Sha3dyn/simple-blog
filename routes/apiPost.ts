@@ -9,7 +9,7 @@ const apiPostRouter : express.Router = express.Router();
 apiPostRouter.use(express.json());
 
 apiPostRouter.delete("/:id", async (req : express.Request, res : express.Response, next : express.NextFunction) => {
-    const post = await prisma.post.findFirst(
+    const post = await prisma.post.findUnique(
         {
             where: {
                 id: Number(req.params.id)
@@ -19,9 +19,13 @@ apiPostRouter.delete("/:id", async (req : express.Request, res : express.Respons
 
     if(post) {
         try {
+            await prisma.comment.deleteMany({
+                where: { postId: post.id }
+            });
+
             await prisma.post.delete({
                 where: {
-                    id: Number(req.params.id)
+                    id: Number(post.id)
                 }
             });
 
@@ -38,15 +42,19 @@ apiPostRouter.delete("/:id", async (req : express.Request, res : express.Respons
 apiPostRouter.put("/:id", async (req : express.Request, res : express.Response, next : express.NextFunction) => {
     const categories = req.body.categories || [];
 
-    const post = await prisma.post.findFirst(
+    const post = await prisma.post.findUnique(
         {
             where: {
                 id: Number(req.params.id)
             },
+            include: {
+                comments: true
+            }
         }
     );
 
     if(post) {
+        console.log(req.body);
         try {
             await prisma.post.update({
                 where: {
@@ -56,8 +64,7 @@ apiPostRouter.put("/:id", async (req : express.Request, res : express.Response, 
                     title: req.body.title,
                     content: req.body.content,
                     updatedAt: new Date(),
-                    userId: post.userId,
-                    categories: { connect: categories }
+                    categories: { connect: categories },
                 }
             });
 

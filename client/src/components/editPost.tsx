@@ -15,10 +15,9 @@ import {
     SelectChangeEvent,
     Chip,
 } from '@mui/material';
-import { useNavigate, NavigateFunction } from 'react-router-dom';
 import ReactQuill from 'react-quill';
 import "react-quill/dist/quill.snow.css";
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate, NavigateFunction } from 'react-router-dom';
 
 interface Props {
     token: string

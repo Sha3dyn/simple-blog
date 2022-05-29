@@ -21,7 +21,7 @@ import {
     CalendarToday,
 } from '@mui/icons-material';
 import CommentIcon from '@mui/icons-material/Comment';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate, NavigateFunction } from 'react-router-dom';
 
 interface Props {
     token: string
@@ -62,6 +62,7 @@ interface Category {
 const PostView : React.FC<Props> = (props: Props) : React.ReactElement => {
     const { id } = useParams();
     const { token, user } = props;
+    const navigate : NavigateFunction = useNavigate();
     const [data, setData] = useState<PostData>({
                                                 post: {
                                                     id: 0,
@@ -131,6 +132,27 @@ const PostView : React.FC<Props> = (props: Props) : React.ReactElement => {
         return `${day} klo ${time}`;
     }
 
+    const handleDelete = async (id: number) => {
+        try {
+            const conn = await fetch(`/api/post/${id}`, {
+                method: "DELETE",
+                headers: {
+                    'Authorization' : `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            const post = await conn.json();
+                
+            if (conn.status === 200) {
+                setData({ ...data, post: post, fetched: true });
+                navigate("/");
+            }
+        } catch (e : any) {
+            setData({ ...data, error: "Palvelimeen ei saada yhteyttä", fetched: true });
+        }
+    };
+
     return (
         <Container maxWidth="lg">
             <Stack spacing={5} sx={{ mt: 5 }}>
@@ -182,7 +204,7 @@ const PostView : React.FC<Props> = (props: Props) : React.ReactElement => {
                     {user && token && user !== "null" && token !== "null"
                       ? <CardActions>
                             <Button size="small" href={`/post/${id}`}>Muokkaa</Button>
-                            <Button size="small" href="/">Poista</Button>
+                            <Button size="small" onClick={() => handleDelete(Number(id))}>Poista</Button>
                         </CardActions>
                       : null
                     }

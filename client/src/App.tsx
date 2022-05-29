@@ -44,7 +44,7 @@ const App : React.FC = () : React.ReactElement => {
       </Box>
       <main>
         <Routes>
-          <Route path="/" element={<Blog token={token} user={user} />}/>
+        <Route path="/" element={<Blog token={token} user={user} />}/>
           <Route path="/:id" element={<Post token={token} user={user} />}/>
           <Route path="/post" element={<NewPost token={token} user={user} />}/>
           <Route path="/post/:id" element={<EditPost token={token} user={user} />}/>
